@@ -1,0 +1,31 @@
+name: project
+description: "A new Flutter project."
+publish_to: 'none' 
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  getwidget: ^7.0.0
+  flutter_svg: ^2.0.10+1
+  url_launcher: ^6.3.0
+  file_picker: ^6.2.1
+  http: ^1.2.1
+  intl: ^0.19.0 # `intl` 패키지 추가
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  assets:
+    - assets/
+  uses-material-design: true
