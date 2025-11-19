@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart';
+import 'screens/role_selection_screen.dart'; // 1. 시작 화면 import 변경
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       scrollBehavior: MyCustomScrollBehavior(),
-      home: const HomePage(),
+      home: const RoleSelectionScreen(), // 2. 시작 화면을 RoleSelectionScreen으로 변경
       debugShowCheckedModeBanner: false,
     );
   }

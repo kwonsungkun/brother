@@ -108,8 +108,35 @@ class _BillingDetailsScreenState extends State<BillingDetailsScreen> with Ticker
     return Row(children: [_buildPeriodButton('월', 0), _buildPeriodButton('년', 1), _buildPeriodButton('전체', 2)]);
   }
 
+  // 1. 화면 흔들림 문제 해결
   Widget _buildTimeNavigation() {
-    if (_periodSelection[0]) { return Row(mainAxisAlignment: MainAxisAlignment.start, children: [IconButton(icon: const Icon(Icons.arrow_left), onPressed: () => setState(() => _currentMonth = (_currentMonth - 1) < 1 ? 12 : _currentMonth - 1)), Text('$_currentMonth월', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), IconButton(icon: const Icon(Icons.arrow_right), onPressed: () => setState(() => _currentMonth = (_currentMonth + 1) > 12 ? 1 : _currentMonth + 1))]); } else if (_periodSelection[1]) { return Row(mainAxisAlignment: MainAxisAlignment.start, children: [IconButton(icon: const Icon(Icons.arrow_left), onPressed: () => setState(() => _currentYear--)), Text('$_currentYear년', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)), IconButton(icon: const Icon(Icons.arrow_right), onPressed: () => setState(() => _currentYear++))]); } else { return SizedBox(height: 48.0, child: Row(children: const [SizedBox(width: 8), Text('22.1.6 ~ 25.11.4', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87))])); }
+    if (_periodSelection[0]) { // '월' 선택 시
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          IconButton(icon: const Icon(Icons.arrow_left), onPressed: () => setState(() => _currentMonth = (_currentMonth - 1) < 1 ? 12 : _currentMonth - 1)),
+          Text('$_currentMonth월', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          IconButton(icon: const Icon(Icons.arrow_right), onPressed: () => setState(() => _currentMonth = (_currentMonth + 1) > 12 ? 1 : _currentMonth + 1)),
+        ],
+      );
+    } else if (_periodSelection[1]) { // '년' 선택 시
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          IconButton(icon: const Icon(Icons.arrow_left), onPressed: () => setState(() => _currentYear--)),
+          Text('$_currentYear년', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          IconButton(icon: const Icon(Icons.arrow_right), onPressed: () => setState(() => _currentYear++)),
+        ],
+      );
+    } else { // '전체' 선택 시
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Opacity(opacity: 0.0, child: IconButton(icon: const Icon(Icons.arrow_left), onPressed: null)),
+          const Text('22.1.6 ~ 25.11.4', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87)),
+        ],
+      );
+    }
   }
 
   Widget _buildProfitRow(String title, String amount, {Color? textColor}) {

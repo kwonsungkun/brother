@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:project/screens/home_page.dart';
 import 'folder_detail_screen.dart';
 import '../widgets/management_menu_widget.dart';
+import '../services/ocr_service.dart'; // 통합 OCR 서비스 import
 
 class FileManagerScreen extends StatefulWidget {
   const FileManagerScreen({super.key});
@@ -51,11 +53,24 @@ class _FileManagerScreenState extends State<FileManagerScreen> {
   }
 
   void _uploadAndCategorizeFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.any);
 
     if (result != null) {
-      String fileName = result.files.single.name;
+      final fileName = result.files.single.name;
+      final filePath = result.files.single.path;
+      bool hasKeyword = false;
 
+      if (!kIsWeb && filePath != null) {
+        // OCR 서비스를 호출하여 키워드 확인 (모바일 전용)
+        hasKeyword = await OcrService.performOcr(filePath);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('웹에서는 OCR 분석이 지원되지 않습니다.')),
+          );
+        }
+      }
+      
       final String targetFolder;
       if (fileName.contains('등기부등본')) {
         targetFolder = '등기부등본';
@@ -69,25 +84,48 @@ class _FileManagerScreenState extends State<FileManagerScreen> {
         targetFolder = '기타';
       }
 
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('업로드 완료 (시뮬레이션)'),
-            content: Text('\'$fileName\' 파일이 OCR 분석 후 서버의 \'$targetFolder\' 폴더에 저장되었습니다.'),
-            actions: [
-              TextButton(
-                child: const Text('확인'),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
+      if (mounted) {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('업로드 완료 (시뮬레이션)'),
+              content: Text("'$fileName' 파일이 서버의 '$targetFolder' 폴더에 저장되었습니다."),
+              actions: [
+                TextButton(
+                  child: const Text('확인'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+      if (hasKeyword) {
+        if (mounted) {
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('완료'),
+                content: const Text("문서에서 '결과보고서' 단어를 확인했습니다."),
+                actions: [
+                  TextButton(
+                    child: const Text('확인'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              );
+            },
           );
-        },
-      );
+        }
+      }
     } else {
       // User canceled the picker
     }
   }
+
 
   void _addFolder() {
     final folderNameController = TextEditingController();

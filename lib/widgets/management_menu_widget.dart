@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/as_board_screen.dart';
 import '../screens/empty_room_list_screen.dart';
-import '../screens/asset_status_screen.dart'; // 1. 새로 만든 화면 import
+import '../screens/asset_status_screen.dart';
 import '../screens/unpaid_list_screen.dart';
 import '../screens/notification_screen.dart';
 
@@ -20,7 +20,6 @@ class ManagementMenuWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              // 2. '장부관리' 목적지를 AssetStatusScreen으로 변경
               _buildMenuItem(Icons.book, '장부관리', () {
                 Navigator.push(
                   context,
@@ -42,10 +41,10 @@ class ManagementMenuWidget extends StatelessWidget {
               _buildMenuItem(Icons.support_agent, 'A/S', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ASBoardScreen()),
+                  MaterialPageRoute(builder: (context) => const AsBoardScreen()),
                 );
               }),
-              _buildMenuItem(Icons.campaign, '알림', () { // 아이콘 변경
+              _buildMenuItem(Icons.campaign, '알림', () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const NotificationScreen()),
@@ -66,7 +65,7 @@ class ManagementMenuWidget extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Icon(icon, size: 40, color: Colors.blueAccent),
+            Icon(icon, size: 40, color: Colors.deepPurple.shade400), // 아이콘 색상 변경
             const SizedBox(height: 8),
             Text(label),
           ],

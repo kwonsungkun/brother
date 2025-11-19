@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'as_board_screen.dart';
-import 'notification_history_screen.dart'; // 알림 내역 화면 import
+import 'notification_history_screen.dart';
+import 'cash_screen.dart'; // cash_screen.dart import
 
 class HomePage extends StatefulWidget {
   final int initialIndex;
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late int _selectedIndex;
-  bool _hasNewNotification = true; // 1. 새로운 알림 유무 상태 변수
+  bool _hasNewNotification = true;
 
   @override
   void initState() {
@@ -23,9 +24,9 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomeScreen(),
-    const Center(child: Text('캐쉬 페이지')),
+    const CashScreen(), // '캐쉬' 탭에 CashScreen 연결
     const Center(child: Text('상품 페이지')),
-    const Center(child: Text('커뮤니티 게시판')), // 1. 커뮤니티 탭 연결 해제
+    const Center(child: Text('커뮤니티 게시판')),
     const Center(child: Text('내집홍보 페이지')),
   ];
 
@@ -73,8 +74,16 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Image.asset('assets/logo.png'), 
+          child: Image.asset('assets/logo.png'),
         ),
+        title: const Text(
+          'Brother Company',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold
+          )
+        ),
+        titleSpacing: 0,
         automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 1,
@@ -105,9 +114,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
-      floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(onPressed: () {}, child: const Icon(Icons.chat_bubble_outline), tooltip: '챗봇',)
-          : null,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(icon: Icon(Icons.home), label: '홈'),
@@ -117,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.campaign), label: '내집홍보'),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blueAccent,
+        selectedItemColor: Colors.deepPurple.shade400,
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,

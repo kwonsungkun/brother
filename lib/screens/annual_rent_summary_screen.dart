@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:project/screens/asset_status_screen.dart';
+import 'package:project/models/asset_models.dart';
 
 enum PaymentStatus { paid, unpaid, scheduled }
 
@@ -14,8 +14,14 @@ class MonthlyPayment {
 class AnnualRentSummaryScreen extends StatefulWidget {
   final Unit unit;
   final Building building;
+  final bool isDeposit;
 
-  const AnnualRentSummaryScreen({super.key, required this.unit, required this.building});
+  const AnnualRentSummaryScreen({
+    super.key, 
+    required this.unit, 
+    required this.building,
+    this.isDeposit = false,
+  });
 
   @override
   State<AnnualRentSummaryScreen> createState() => _AnnualRentSummaryScreenState();
@@ -62,6 +68,22 @@ class _AnnualRentSummaryScreenState extends State<AnnualRentSummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: AppBar(
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => Navigator.of(context).pop()),
+        title: Text(widget.isDeposit ? '보증금 반환 현황' : '월세 납부 현황'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 1,
+      ),
+      body: widget.isDeposit
+          ? _buildDepositBody()
+          : _buildRentBody(),
+    );
+  }
+
+  Widget _buildRentBody() {
     final rentString = widget.unit.rent;
     int monthlyRent = 0;
     if (rentString.isNotEmpty && rentString != '-') {
@@ -84,25 +106,76 @@ class _AnnualRentSummaryScreenState extends State<AnnualRentSummaryScreen> {
     final totalPaid = paidCount * monthlyRent;
     final totalUnpaid = unpaidCount * monthlyRent;
 
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, size: 20), onPressed: () => Navigator.of(context).pop()),
-        title: Text('${widget.building.name} ${widget.unit.roomNumber}'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 1,
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        _buildYearSelector(),
+        const SizedBox(height: 16),
+        _buildSummaryCard(currencyFormat, totalExpected, totalPaid, totalUnpaid),
+        const SizedBox(height: 24),
+        _buildMonthlyDetailSection(currentYearPayments),
+      ],
+    );
+  }
+
+  Widget _buildDepositBody() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('${widget.building.name} ${widget.unit.roomNumber}', style: Theme.of(context).textTheme.headlineSmall), 
+            const SizedBox(height: 8),
+            Text('임차인: ${widget.unit.tenantName}', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 24),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    const Text('보증금 반환 상태', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    _buildStatusChip(widget.unit.depositStatus),
+                    const SizedBox(height: 16),
+                    Text('보증금: ${widget.unit.deposit}', style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildYearSelector(),
-          const SizedBox(height: 16),
-          _buildSummaryCard(currencyFormat, totalExpected, totalPaid, totalUnpaid),
-          const SizedBox(height: 24),
-          _buildMonthlyDetailSection(currentYearPayments),
-        ],
-      ),
+    );
+  }
+
+  Widget _buildStatusChip(DepositStatus status) {
+    String text;
+    Color backgroundColor;
+    Color textColor;
+
+    switch (status) {
+      case DepositStatus.imminent:
+        text = '임박';
+        backgroundColor = Colors.red.shade100;
+        textColor = Colors.red.shade800;
+        break;
+      case DepositStatus.returned:
+        text = '반환됨';
+        backgroundColor = Colors.green.shade100;
+        textColor = Colors.green.shade800;
+        break;
+      case DepositStatus.partiallyReturned:
+        text = '부분반환';
+        backgroundColor = Colors.orange.shade100;
+        textColor = Colors.orange.shade800;
+        break;
+    }
+
+    return Chip(
+      label: Text(text, style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+      backgroundColor: backgroundColor,
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
     );
   }
 
